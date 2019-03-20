@@ -1,0 +1,428 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Turing!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Végtelen ciklus</title>
+        <para>
+            Írj olyan C végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
+            100 százalékban minden magot!
+        </para>
+        <para>
+        <programlisting language="c">
+                <![CDATA[
+            #include <unistd.h>
+                int main ()
+                {
+                for (;;)
+                    sleep (1);
+                return 0;
+                }
+		]]>
+	</programlisting>
+	<programlisting language="c">
+	<![CDATA[
+	#include <stdio.h>
+	#include <omp.h>
+	int main(void)
+	{
+	#pragma omp parallel
+	{
+	for(;;)
+	{
+	}
+	}
+	return 0;
+	}
+	]]>
+
+	</programlisting>
+	<programlisting language="c">
+	<![CDATA[
+	#include <omp.h>
+	int main()
+	{
+	#pragma omp parallel
+	{
+		for(;;);
+	}
+	return 0;
+	}
+	]]>
+
+	</programlisting>
+        </para>
+	<para>
+            Megoldás forrása:
+        </para>
+	<para>
+	    Tanulságok, tapasztalatok, magyarázat...
+		for(;;) az ez egyik leggyakoribb végtelen ciklus és mivel ez a ciklus sose all le
+		emiatt terheli a proci egyik magjat 100%-ra
+		a sleep(i) parancs az csak egy alvas parancs mely i masodperce allitja altatja el a programot
+		 Minden mag 100% terhelését szálasítással lehet megoldani az OpenMP segítségével.
+	</para>            
+    </section>        
+        
+    <section>
+        <title>Lefagyott, nem fagyott, akkor most mi van?</title>
+        <para>
+            Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
+        </para>
+        <para>
+            Megoldás videó:
+        </para>
+        <para>
+            Megoldás forrása:  tegyük fel, hogy akkora haxorok vagyunk, hogy meg tudjuk írni a <function>Lefagy</function>
+            függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne vlgtelen ciklus:              
+        </para>
+        <programlisting language="c"><![CDATA[Program T100
+{
+
+	boolean Lefagy(Program P)
+	{
+		 if(P-ben van végtelen ciklus)
+			return true;
+		 else
+			return false; 
+	}
+
+	main(Input Q)
+	{
+		Lefagy(Q)
+	}
+}]]></programlisting>            
+        <para>
+            A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
+            <screen><![CDATA[T100(t.c.pseudo)
+true]]></screen>            
+            akár önmagára
+            <screen><![CDATA[T100(T100)
+false]]></screen>  
+            ezt a kimenetet adja.          
+        </para>
+        <para>
+            A T100-as programot felhasználva készítsük most el az alábbi T1000-set, amelyben a
+            Lefagy-ra épőlő Lefagy2 már nem tartalmaz feltételezett, csak csak konkrét kódot:
+        </para>
+        <programlisting language="c"><![CDATA[Program T1000
+{
+
+	boolean Lefagy(Program P)
+	{
+		 if(P-ben van végtelen ciklus)
+			return true;
+		 else
+			return false; 
+	}
+
+	boolean Lefagy2(Program P)
+	{
+		 if(Lefagy(P))
+			return true;
+		 else
+			for(;;); 
+	}
+
+	main(Input Q)
+	{
+		Lefagy2(Q)
+	}
+
+}]]></programlisting>            
+        <programlisting><![CDATA[]]></programlisting>            
+        <para>
+            Mit for kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
+                                
+            <itemizedlist>
+                <listitem>
+                    <para>Ha T1000 lefagyó, akkor nem fog lefagyni, kiírja, hogy true</para>                        
+                </listitem>
+                <listitem>
+                    <para>Ha T1000 nem fagyó, akkor pedig le fog fagyni...</para>                        
+                </listitem>
+            </itemizedlist>
+            akkor most hogy fog működni? Sehogy, mert ilyen <function>Lefagy</function>
+            függvényt, azaz a T100 program nem is létezik.                
+        </para>
+        <para>
+            A feladatnak nincs megoldása mivel:
+            Ha a vizsgált program tartalmaz végtelen ciklust:
+             <function>Lefagy</function>=true és <function>Lefagy2</function>szintén true lesz.
+             Ha a vizsgált program nem tartalmaz végtelen ciklust:
+             <function>Lefagy</function>=false=><function>Lefagy2</function>=végtelen ciklus lesz.
+        </para>
+    </section>        
+                
+    <section>
+        <title>Változók értékének felcserélése</title>
+        <para>
+            Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
+            nasználata nélkül!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/10_begin_goto_20_avagy_elindulunk">https://bhaxor.blog.hu/2018/08/28/10_begin_goto_20_avagy_elindulunk</link>
+        </para>
+	 <para>
+            <programlisting language="c">
+                <![CDATA[
+            #include <stdio.h>
+
+int main()
+{
+	int a = 2;
+	int b = 1;
+
+	b = b-a;
+	a = a+b;
+	b = a-b;
+
+	printf(a);
+	printf(b);
+	return 0;
+}
+]]>
+</programlisting>
+        </para>
+
+        <para>
+            Megoldás forrása:  
+        </para>
+        <para>
+            E feladat megoldása véleményem szerint egyértelmű.
+        </para>
+    </section>                     
+
+    <section>
+        <title>Labdapattogás</title>
+        <para>
+            Először if-ekkel, majd bármiféle logikai utasítás vagy kifejezés
+            nasználata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! (Hogy mit értek
+            pattogtatás alatt, alább láthatod a videókon.)
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/labdapattogas">https://bhaxor.blog.hu/2018/08/28/labdapattogas</link>
+        </para>
+        <para>
+        <programlisting language="c">
+                <![CDATA[  
+	#include <stdio.h>
+#include <stdlib.h>
+
+char bitzero(char x) {
+    int i;
+    char bitt = x&0x1;
+    for (i=0; i<8; i++) {
+        bitt |= (x>>i)&1;
+    }
+    return 1-bitt;
+}
+
+void rajzol(char width, char height) {
+    int i;
+    /*magasság*/
+    for (i=1; i<=height; i++) {
+        printf("\n");
+    }
+    /*szélesség*/
+    for (i=1; i<=width; i++) {
+        printf(" ");
+    }
+    printf("O\n");
+}
+
+int main() {
+    char x=1, y=1, vx=1, vy=1;
+    while(1) {
+        system("clear");
+        vx-=2*bitzero(79-x);    //balra pattanjon
+        vx+=2*bitzero(x);       //
+        vy-=2*bitzero(24-y);    //lefele
+        vy+=2*bitzero(y);       //
+        x+=vx;
+        y+=vy;
+        //printf("X: %d Y: %d \n", x, y);              //Koordináták
+        //printf("Vx: %d Vy: %d", vx, vy);             //Velocity
+        rajzol(x,y);
+        usleep(100000);
+    } 
+	return 0;
+}
+		]]>
+	</programlisting>
+
+        </para>
+        <para>
+            Tanulságok, tapasztalatok, magyarázat...
+        </para>
+    </section>                     
+
+    <section>
+        <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
+        <para>
+            Írj egy programot, ami megnézi, hogy hány bites a szó a gépeden, azaz mekkora az <type>int</type> mérete.
+            Használd ugyanazt a while ciklus fejet, amit Linus Torvalds a BogoMIPS rutinjában! 
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href=""></link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href=""></link>
+        </para>
+	<para>
+			<programlisting language="c">
+                <![CDATA[
+		#include <time.h>
+#include <stdio.h>
+
+void
+delay (unsigned long long loops)
+{
+  for (unsigned long long i = 0; i < loops; i++);
+}
+
+int
+main (void)
+{
+  unsigned long long loops_per_sec = 1;
+  unsigned long long ticks;
+
+  printf ("Calibrating delay loop..");
+  fflush (stdout);
+
+  while ((loops_per_sec <<= 1))
+    {
+      ticks = clock ();
+      delay (loops_per_sec);
+      ticks = clock () - ticks;
+
+      if (ticks >= CLOCKS_PER_SEC)
+	{
+	  loops_per_sec = (loops_per_sec / ticks) * CLOCKS_PER_SEC;
+
+	  printf ("ok - %llu.%02llu BogoMIPS\n", loops_per_sec / 500000,
+		  (loops_per_sec / 5000) % 100);
+
+	  return 0;
+	}
+    }
+
+  printf ("failed\n");
+  return -1;
+}
+		]]>
+	</programlisting>
+	</para>
+	<para>
+	<para>
+            <programlisting language="R"><![CDATA[
+library(matlab)
+stp <- function(x){
+    primes = primes(x)
+    diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+    idx = which(diff==2)
+    t1primes = primes[idx]
+    t2primes = primes[idx]+2
+    rt1plust2 = 1/t1primes+1/t2primes
+    return(sum(rt1plust2))
+}
+
+x=seq(13, 1000000, by=10000)
+y=sapply(x, FUN = stp)
+plot(x,y,type="b")]]>
+        </programlisting>
+        </para>
+
+	</para>
+        <para>
+            Tanulságok, tapasztalatok, magyarázat... 
+        </para>
+    </section>                     
+
+    <section>
+        <title>Helló, Google!</title>
+        <para>
+            Írj olyan C programot, amely egy 4 honlapból álló hálózatra kiszámolja a négy lap Page-Rank 
+            értékét!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href=""></link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href=""></link>
+        </para>
+        <para>
+            Tanulságok, tapasztalatok, magyarázat...
+        </para>
+    </section>
+
+    <section xml:id="Brun">
+        <title>100 éves a Brun tétel</title>
+        <para>
+            Írj R szimulációt a Brun tétel demonstrálására!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/xbYhp9G6VqQ">https://youtu.be/xbYhp9G6VqQ</link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
+        </para>
+<para>
+            <programlisting language="c"><![CDATA[stp <- function(x){
+    primes = primes(x)
+    diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+    idx = which(diff==2)
+    t1primes = primes[idx]
+    t2primes = primes[idx]+2
+    rt1plust2 = 1/t1primes+1/t2primes
+    return(sum(rt1plust2))
+}
+    ]]>
+            </programlisting>
+<para>
+            1. sor kiszámolja a prímeket x-ig.
+        </para>
+        <para>
+            2. sor az egymást követő prímek különbségét veszi. 3-2, 5-3, 7-5, 11-7, 13-11.
+        </para>
+        <para>
+            3. sor megnézi hol 2 a különbség. Ahol igaz, azok ikerprim párok.
+        </para>
+        <para>
+            4. sor a pár első tagját eltárolja, ahol 3 teljesül.
+        </para>
+        <para>
+            5. sor a második tagot az első+2 vel képzi és tárolja, ahol 4 teljesül.
+        </para>
+        <para>
+            Vegül reciprokokat képez, összeadja őket majd visszaadja az érteket.
+</para>
+</para>
+    </section>
+    
+    <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
+        <title>A Monty Hall probléma</title>
+        <para>
+            Írj R szimulációt a Monty Hall problémára!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2019/01/03/erdos_pal_mit_keresett_a_nagykonyvben_a_monty_hall-paradoxon_kapcsan">https://bhaxor.blog.hu/2019/01/03/erdos_pal_mit_keresett_a_nagykonyvben_a_monty_hall-paradoxon_kapcsan</link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R</link>
+        </para>
+        <para>
+            A program véletlen eseteket generál. Meghatározzuk a kísérletek számat majd a játékos vektorban véletlenszerüen megadjuk mit választ esetenkent. A vektorok mérete a kisérletek számával egyenlő.
+        </para>
+        <para>
+            Egy for ciklussal végigmegyünk a kisérletek száman és megnézzuk hogy eltalálta-e az 		eredményt.
+           Ha nem találta el, a műsorvezető kap pontot.
+           Ha nyer, kiértékeljuk hogy hányszor nyert volna változtatás nélkül. Egyéb esetekben változtatással nyert volna.  
+Megszámoljuk a vektorokon az eseményeket majd kiiratjuk az eredményeket..
+        </para>
+    </section>
+
+</chapter>                
